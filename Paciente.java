@@ -1,26 +1,23 @@
 public class Paciente {
-    private int numeroDoProntuario;
+    private int prontuario;
     private String nome;
-    private int idade;
-    private ListaEncadeadaDeConsultas historicoDeConsultas;
+    private ListaConsultas historico;
 
-    public Paciente(int numeroDoProntuario, String nome, int idade) {
-        this.numeroDoProntuario = numeroDoProntuario;
+    public Paciente(int prontuario, String nome) {
+        this.prontuario = prontuario;
         this.nome = nome;
-        this.idade = idade;
-        this.historicoDeConsultas = new ListaEncadeadaDeConsultas();
+        this.historico = new ListaConsultas();
     }
 
-    public int getNumeroDoProntuario() {
-        return numeroDoProntuario;
+    public int getProntuario() {
+        return prontuario;
     }
 
-    public ListaEncadeadaDeConsultas getHistoricoDeConsultas() {
-        return historicoDeConsultas;
+    public ListaConsultas getHistorico() {
+        return historico;
     }
 
-    @Override
     public String toString() {
-        return "Prontuario " + numeroDoProntuario + " | " + nome + " | " + idade + " anos";
+        return "Prontuario " + prontuario + " | " + nome;
     }
 }

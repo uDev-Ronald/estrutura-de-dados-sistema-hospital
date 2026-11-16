@@ -1,97 +1,68 @@
 import java.util.Scanner;
 
 public class Main {
-    private static Scanner leitor = new Scanner(System.in);
-    private static SistemaHospitalar sistema = new SistemaHospitalar();
+    static Scanner sc = new Scanner(System.in);
+    static ArvorePacientes arvore = new ArvorePacientes();
+    static FilaEmergencia fila = new FilaEmergencia();
 
     public static void main(String[] args) {
-        int opcaoEscolhida = -1;
+        int opcao = -1;
 
-        while (opcaoEscolhida != 0) {
-            exibirMenu();
-            opcaoEscolhida = lerNumeroInteiro("Escolha: ");
-            executarOpcao(opcaoEscolhida);
+        while (opcao != 0) {
+            System.out.println();
+            System.out.println("=== HOSPITAL: TRIAGEM ===");
+            System.out.println("1 - Cadastrar paciente");
+            System.out.println("2 - Buscar paciente");
+            System.out.println("3 - Remover paciente do cadastro");
+            System.out.println("4 - Mostrar pacientes (3 percursos)");
+            System.out.println("5 - Colocar paciente na fila");
+            System.out.println("6 - Atender proximo da fila");
+            System.out.println("7 - Listar fila de espera");
+            System.out.println("8 - Ver historico de consultas");
+            System.out.println("9 - Remover consulta do historico");
+            System.out.println("0 - Sair");
+            opcao = lerNumero("Escolha: ");
+
+            if (opcao == 1) {
+                cadastrarPaciente();
+            } else if (opcao == 2) {
+                buscarPaciente();
+            } else if (opcao == 3) {
+                removerPaciente();
+            } else if (opcao == 4) {
+                mostrarPercursos();
+            } else if (opcao == 5) {
+                colocarNaFila();
+            } else if (opcao == 6) {
+                atenderProximo();
+            } else if (opcao == 7) {
+                fila.listar();
+            } else if (opcao == 8) {
+                verHistorico();
+            } else if (opcao == 9) {
+                removerConsulta();
+            } else if (opcao != 0) {
+                System.out.println("Opcao invalida.");
+            }
         }
         System.out.println("Sistema encerrado.");
     }
 
-    private static void exibirMenu() {
-        System.out.println();
-        System.out.println("=== GESTAO HOSPITALAR E TRIAGEM ===");
-        System.out.println("1  - Cadastrar paciente");
-        System.out.println("2  - Buscar paciente");
-        System.out.println("3  - Remover paciente do cadastro");
-        System.out.println("4  - Listar pacientes (em-ordem)");
-        System.out.println("5  - Listar pacientes (pre-ordem)");
-        System.out.println("6  - Listar pacientes (pos-ordem)");
-        System.out.println("7  - Colocar paciente na fila da emergencia");
-        System.out.println("8  - Atender proximo da fila");
-        System.out.println("9  - Remover paciente da fila");
-        System.out.println("10 - Listar fila de espera");
-        System.out.println("11 - Ver historico de consultas");
-        System.out.println("12 - Remover consulta do historico");
-        System.out.println("0  - Sair");
-    }
-
-    private static void executarOpcao(int opcao) {
-        switch (opcao) {
-            case 1:
-                cadastrarPaciente();
-                break;
-            case 2:
-                buscarPaciente();
-                break;
-            case 3:
-                removerPacienteDoCadastro();
-                break;
-            case 4:
-                sistema.listarPacientesEmOrdem();
-                break;
-            case 5:
-                sistema.listarPacientesEmPreOrdem();
-                break;
-            case 6:
-                sistema.listarPacientesEmPosOrdem();
-                break;
-            case 7:
-                colocarPacienteNaFila();
-                break;
-            case 8:
-                atenderProximoDaFila();
-                break;
-            case 9:
-                removerPacienteDaFila();
-                break;
-            case 10:
-                sistema.listarFilaDeEmergencia();
-                break;
-            case 11:
-                sistema.exibirHistoricoDeConsultas(lerNumeroInteiro("Prontuario: "));
-                break;
-            case 12:
-                removerConsultaDoHistorico();
-                break;
-            case 0:
-                break;
-            default:
-                System.out.println("Opcao invalida.");
-        }
-    }
-
-    private static void cadastrarPaciente() {
-        int numeroDoProntuario = lerNumeroInteiro("Prontuario: ");
+    static void cadastrarPaciente() {
+        int prontuario = lerNumero("Prontuario: ");
         String nome = lerTexto("Nome: ");
-        int idade = lerNumeroInteiro("Idade: ");
 
-        if (sistema.cadastrarPaciente(numeroDoProntuario, nome, idade)) {
-            System.out.println("Paciente cadastrado.");
-        } else {
+        if (arvore.buscarPaciente(prontuario) != null) {
             System.out.println("Ja existe paciente com esse prontuario.");
+        } else {
+            arvore.inserirPaciente(new Paciente(prontuario, nome));
+            System.out.println("Paciente cadastrado.");
         }
     }
 
-    private static void buscarPaciente() {
-        Paciente paciente = sistema.buscarPaciente(lerNumeroInteiro("Prontuario: "));
+    static void buscarPaciente() {
+        Paciente paciente = arvore.buscarPaciente(lerNumero("Prontuario: "));
+
         if (paciente == null) {
             System.out.println("Paciente nao encontrado.");
         } else {
@@ -99,61 +70,86 @@ public class Main {
         }
     }
 
-    private static void removerPacienteDoCadastro() {
-        if (sistema.descadastrarPaciente(lerNumeroInteiro("Prontuario: "))) {
-            System.out.println("Paciente removido.");
-        } else {
+    static void removerPaciente() {
+        int prontuario = lerNumero("Prontuario: ");
+
+        if (arvore.buscarPaciente(prontuario) == null) {
             System.out.println("Paciente nao encontrado.");
+        } else if (fila.buscar(prontuario) != null) {
+            System.out.println("Paciente esta na fila. Atenda antes de remover.");
+        } else {
+            arvore.removerPaciente(prontuario);
+            System.out.println("Paciente removido.");
         }
     }
 
-    private static void colocarPacienteNaFila() {
-        System.out.println(sistema.colocarPacienteNaFilaDeEmergencia(lerNumeroInteiro("Prontuario: ")));
+    static void mostrarPercursos() {
+        System.out.println("--- Em-ordem ---");
+        arvore.emOrdem(arvore.getRaiz());
+        System.out.println("--- Pre-ordem ---");
+        arvore.preOrdem(arvore.getRaiz());
+        System.out.println("--- Pos-ordem ---");
+        arvore.posOrdem(arvore.getRaiz());
     }
 
-    private static void atenderProximoDaFila() {
-        String dataDaConsulta = lerTexto("Data da consulta (ex: 15/11/2026): ");
-        String descricaoDoAtendimento = lerTexto("Descricao do atendimento: ");
+    static void colocarNaFila() {
+        int prontuario = lerNumero("Prontuario: ");
+        Paciente paciente = arvore.buscarPaciente(prontuario);
 
-        Paciente pacienteAtendido = sistema.atenderProximoPacienteDaFila(dataDaConsulta, descricaoDoAtendimento);
-        if (pacienteAtendido == null) {
+        if (paciente == null) {
+            System.out.println("Paciente nao cadastrado.");
+        } else if (fila.buscar(prontuario) != null) {
+            System.out.println("Paciente ja esta na fila.");
+        } else {
+            fila.enfileirar(paciente);
+            System.out.println("Paciente colocado na fila.");
+        }
+    }
+
+    static void atenderProximo() {
+        Paciente paciente = fila.desenfileirar();
+
+        if (paciente == null) {
             System.out.println("Fila vazia.");
+            return;
+        }
+
+        String data = lerTexto("Data da consulta: ");
+        String descricao = lerTexto("Descricao: ");
+        paciente.getHistorico().adicionar(new Consulta(data, descricao));
+        System.out.println("Atendido: " + paciente);
+    }
+
+    static void verHistorico() {
+        Paciente paciente = arvore.buscarPaciente(lerNumero("Prontuario: "));
+
+        if (paciente == null) {
+            System.out.println("Paciente nao encontrado.");
         } else {
-            System.out.println("Atendido: " + pacienteAtendido);
+            System.out.println("Historico de " + paciente);
+            paciente.getHistorico().listar();
         }
     }
 
-    private static void removerPacienteDaFila() {
-        if (sistema.removerPacienteDaFilaDeEmergencia(lerNumeroInteiro("Prontuario: "))) {
-            System.out.println("Paciente removido da fila.");
-        } else {
-            System.out.println("Paciente nao esta na fila.");
-        }
-    }
+    static void removerConsulta() {
+        Paciente paciente = arvore.buscarPaciente(lerNumero("Prontuario: "));
 
-    private static void removerConsultaDoHistorico() {
-        int numeroDoProntuario = lerNumeroInteiro("Prontuario: ");
-        String dataDaConsulta = lerTexto("Data da consulta: ");
-
-        if (sistema.removerConsultaDoHistorico(numeroDoProntuario, dataDaConsulta)) {
+        if (paciente == null) {
+            System.out.println("Paciente nao encontrado.");
+        } else if (paciente.getHistorico().remover(lerTexto("Data da consulta: "))) {
             System.out.println("Consulta removida.");
         } else {
             System.out.println("Consulta nao encontrada.");
         }
     }
 
-    private static String lerTexto(String mensagem) {
+    static String lerTexto(String mensagem) {
         System.out.print(mensagem);
-        return leitor.nextLine();
+        return sc.nextLine();
     }
 
-    private static int lerNumeroInteiro(String mensagem) {
-        while (true) {
-            try {
-                return Integer.parseInt(lerTexto(mensagem).trim());
-            } catch (NumberFormatException erro) {
-                System.out.println("Digite apenas numeros.");
-            }
-        }
+    static int lerNumero(String mensagem) {
+        System.out.print(mensagem);
+        return Integer.parseInt(sc.nextLine().trim());
     }
 }

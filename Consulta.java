@@ -1,22 +1,17 @@
 public class Consulta {
-    private String dataDaConsulta;
-    private String descricaoDoAtendimento;
+    private String data;
+    private String descricao;
 
-    public Consulta(String dataDaConsulta, String descricaoDoAtendimento) {
-        this.dataDaConsulta = dataDaConsulta;
-        this.descricaoDoAtendimento = descricaoDoAtendimento;
+    public Consulta(String data, String descricao) {
+        this.data = data;
+        this.descricao = descricao;
     }
 
-    public String getDataDaConsulta() {
-        return dataDaConsulta;
+    public String getData() {
+        return data;
     }
 
-    public String getDescricaoDoAtendimento() {
-        return descricaoDoAtendimento;
-    }
-
-    @Override
     public String toString() {
-        return dataDaConsulta + " - " + descricaoDoAtendimento;
+        return data + " - " + descricao;
     }
 }
