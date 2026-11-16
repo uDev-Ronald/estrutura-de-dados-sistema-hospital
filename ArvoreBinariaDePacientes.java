@@ -19,23 +19,21 @@ public class ArvoreBinariaDePacientes {
     }
 
     public Paciente buscarPacientePeloProntuario(int prontuarioProcurado) {
-        return buscarNaSubarvore(raiz, prontuarioProcurado);
-    }
+        NoDaArvore noAtual = raiz;
 
-    private Paciente buscarNaSubarvore(NoDaArvore noAtual, int prontuarioProcurado) {
-        if (noAtual == null) {
-            return null;
-        }
+        while (noAtual != null) {
+            int prontuarioDoNoAtual = noAtual.getPaciente().getNumeroDoProntuario();
 
-        int prontuarioDoNoAtual = noAtual.getPaciente().getNumeroDoProntuario();
-
-        if (prontuarioProcurado == prontuarioDoNoAtual) {
-            return noAtual.getPaciente();
+            if (prontuarioProcurado == prontuarioDoNoAtual) {
+                return noAtual.getPaciente();
+            }
+            if (prontuarioProcurado < prontuarioDoNoAtual) {
+                noAtual = noAtual.getFilhoEsquerdo();
+            } else {
+                noAtual = noAtual.getFilhoDireito();
+            }
         }
-        if (prontuarioProcurado < prontuarioDoNoAtual) {
-            return buscarNaSubarvore(noAtual.getFilhoEsquerdo(), prontuarioProcurado);
-        }
-        return buscarNaSubarvore(noAtual.getFilhoDireito(), prontuarioProcurado);
+        return null;
     }
 
     public void removerPacientePeloProntuario(int prontuarioParaRemover) {
@@ -70,18 +68,18 @@ public class ArvoreBinariaDePacientes {
             return noAtual.getFilhoEsquerdo();
         }
 
-        NoDaArvore noSucessor = encontrarNoComMenorProntuario(noAtual.getFilhoDireito());
-        noAtual.setPaciente(noSucessor.getPaciente());
-        noAtual.setFilhoDireito(
-            removerDaSubarvore(noAtual.getFilhoDireito(), noSucessor.getPaciente().getNumeroDoProntuario())
+        NoDaArvore noComMaiorProntuario = encontrarNoComMaiorProntuario(noAtual.getFilhoEsquerdo());
+        noAtual.setPaciente(noComMaiorProntuario.getPaciente());
+        noAtual.setFilhoEsquerdo(
+            removerDaSubarvore(noAtual.getFilhoEsquerdo(), noComMaiorProntuario.getPaciente().getNumeroDoProntuario())
         );
         return noAtual;
     }
 
-    private NoDaArvore encontrarNoComMenorProntuario(NoDaArvore noInicial) {
+    private NoDaArvore encontrarNoComMaiorProntuario(NoDaArvore noInicial) {
         NoDaArvore noAtual = noInicial;
-        while (noAtual.getFilhoEsquerdo() != null) {
-            noAtual = noAtual.getFilhoEsquerdo();
+        while (noAtual.getFilhoDireito() != null) {
+            noAtual = noAtual.getFilhoDireito();
         }
         return noAtual;
     }

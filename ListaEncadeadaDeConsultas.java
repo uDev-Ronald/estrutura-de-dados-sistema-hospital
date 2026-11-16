@@ -1,5 +1,6 @@
 public class ListaEncadeadaDeConsultas {
     private NoDaListaDeConsultas primeiroNo;
+    private NoDaListaDeConsultas ultimoNo;
 
     public boolean estaVazia() {
         return primeiroNo == null;
@@ -10,14 +11,12 @@ public class ListaEncadeadaDeConsultas {
 
         if (estaVazia()) {
             primeiroNo = novoNo;
+            ultimoNo = novoNo;
             return;
         }
 
-        NoDaListaDeConsultas noAtual = primeiroNo;
-        while (noAtual.getProximoNo() != null) {
-            noAtual = noAtual.getProximoNo();
-        }
-        noAtual.setProximoNo(novoNo);
+        ultimoNo.setProximoNo(novoNo);
+        ultimoNo = novoNo;
     }
 
     public Consulta buscarConsultaPelaData(String dataProcurada) {
@@ -38,6 +37,9 @@ public class ListaEncadeadaDeConsultas {
 
         if (primeiroNo.getConsulta().getDataDaConsulta().equals(dataProcurada)) {
             primeiroNo = primeiroNo.getProximoNo();
+            if (primeiroNo == null) {
+                ultimoNo = null;
+            }
             return true;
         }
 
@@ -46,6 +48,9 @@ public class ListaEncadeadaDeConsultas {
             NoDaListaDeConsultas noSeguinte = noAtual.getProximoNo();
             if (noSeguinte.getConsulta().getDataDaConsulta().equals(dataProcurada)) {
                 noAtual.setProximoNo(noSeguinte.getProximoNo());
+                if (noSeguinte == ultimoNo) {
+                    ultimoNo = noAtual;
+                }
                 return true;
             }
             noAtual = noSeguinte;
